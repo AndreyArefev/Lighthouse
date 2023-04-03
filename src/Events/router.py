@@ -1,53 +1,84 @@
-from fastapi import FastAPI, APIRouter, Query
-
-router = APIRouter()
-
-
-@router.get('/')
-def get_home_page():
-    return 'home_page'
+import service
+from typing import List
+from fastapi import APIRouter, Query, Response, status
+from datetime import date
+from .schemas import Event, Category, Tag
 
 
-@router.get('/events')
+router = APIRouter(
+    prefix='/events',
+    tags=['Events']
+)
+
+
+@router.get('/',
+            response_model=List[Event])
 def get_events():
-    return 'какую-то логику'
+    return service.get_events()
 
 
-@router.get('/events/search')
+@router.post('/',
+             response_model=Event,
+             status_code=status.HTTP_201_CREATED)
+def add_event(event: Event):
+    return service.add_event()
+
+
+@router.get('/search',
+            response_model=List[Event])
 def get_events_search_by_name(name_event: str = Query()):
-    return 'какую-то логику'
+    return service.get_events_search_by_name(name_event)
 
 
-@router.get('/events/{id_event}')
+@router.get('/{id_event}',
+            response_model=Event)
 def get_event(id_event: int):
-    return 'какую-то логику'
+    return service.get_event(id_event)
 
 
-@router.get('/events/categories')
+@router.put('/{id_event}',
+            response_model=Event)
+def put_event(id_event: int):
+    return service.put_event(id_event)
+
+
+@router.delete('/{id_event}',
+               status_code=status.HTTP_204_NO_CONTENT)
+def del_event(id_event: int):
+    return service.del_event(id_event)
+
+
+@router.get('/categories',
+            response_model=List[Category])
 def get_categories():
-    return 'какую-то логику'
+    return service.get_categories()
 
 
-@router.get('/events/categories/{id_category}')
+@router.get('/categories/{id_category}',
+            response_model=Category)
 def get_events_category(id_category: int):
-    return 'какую-то логику'
+    return service.get_events_category(id_category)
 
 
-@router.get('/events/tags')
+@router.get('/tags',
+            response_model=List[Tag])
 def get_tags():
-    return 'какую-то логику'
+    return service.get_tags()
 
 
-@router.get('/events/tags/{id_tag}')
+@router.get('/tags/{id_tag}',
+            response_model=Tag)
 def get_events_tag(id_tag: int):
-    return 'какую-то логику'
+    return service.get_events_tag(id_tag)
 
 
-@router.get('/events/calendar/{date}')
-def get_events_on_date(date: date):
-    return 'какую-то логику'
+@router.get('/calendar/{current_date}',
+            response_model=List[Event])
+def get_events_on_date(current_date: date):
+    return service.get_events_on_date(current_date)
 
 
-@router.get('/events/{id_user}')
+@router.get('/{id_user}',
+            response_model=List[Event])
 def get_events_selected_user(id_user: int):
-    return 'какую-то логику'
+    return service.get_events_selected_user(id_user)
