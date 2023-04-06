@@ -5,14 +5,14 @@ from ..Auth.schemas import User
 
 
 class Category(BaseModel):
-    name_category: str
+    name_category: str = Field(min_length=2, max_length=100)
     #если жестко зашить категории, то делать Enum-класс доплнительно, для лучшей валидации,
     #но я думаю что нужна возможность админу добавлять категории, просто на фронте
     # не давать возможности вводить левые категории.
 
 
 class Tag(BaseModel):
-    name_tag: str
+    name_tag: str = Field(min_length=2, max_length=150)
 
 
 class Event(BaseModel):
