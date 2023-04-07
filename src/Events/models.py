@@ -10,7 +10,7 @@ class Event (Base):
     __tablename__ = 'events'
     id_event = Column(Integer, primary_key=True)
     name_event = Column(String(200), nullable=False)
-    id_category = Column(Integer, ForeignKey('categories.id'))
+    id_category = Column(Integer, ForeignKey('categories.id_category'))
     category = relationship('Category', back_populates='events')
     tags = relationship('Tag', secondary='tableEventTag', back_populates='events')
     time_event = Column(TIMESTAMP)
