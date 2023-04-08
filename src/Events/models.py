@@ -1,16 +1,18 @@
 from datetime import datetime
-from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Text
+from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from src.database import Base
 
-Base = declarative_base()
+
+#Base = declarative_base()
 
 
 class Event (Base):
-    __tablename__ = 'events'
+    __tablename__ = 'event'
     id_event = Column(Integer, primary_key=True)
     name_event = Column(String(200), nullable=False)
-    id_category = Column(Integer, ForeignKey('categories.id_category'))
+    id_category = Column(Integer, ForeignKey('category.id_category'))
     category = relationship('Category', back_populates='events')
     tags = relationship('Tag', secondary='tableEventTag', back_populates='events')
     time_event = Column(TIMESTAMP)
@@ -20,18 +22,19 @@ class Event (Base):
     age_limit = Column(Integer)
     image = Column(String)
     link = Column(String)
-    organizer = Column(String) #связать с польхователем
+    id_organizer = Column(Integer, ForeignKey('user.id_user'))
+    organizer = relationship('User', back_populates='events')
 
 
 class Category(Base):
-    __tablename__ = 'categories'
+    __tablename__ = 'category'
     id_category = Column(Integer, primary_key=True)
     name_category = Column(String, nullable=False)
     events = relationship('Event', back_populates='category')
 
 
 class Tag(Base):
-    __tablename__ = 'tags'
+    __tablename__ = 'tag'
     id_tag = Column(Integer, primary_key=True)
     name_tag = Column(String(150), nullable=False)
     events = relationship('Event', secondary='tableEventTag', back_populates='tags')
@@ -39,6 +42,6 @@ class Tag(Base):
 
 tableEventTag = Table('table_event_tag',
                       Base.metadata,
-                      Column('event', ForeignKey('events.id_event'), primary_key=True),
-                      Column('tag', ForeignKey('tags.id_tag'), primary_key=True),
+                      Column('event', ForeignKey('event.id_event'), primary_key=True),
+                      Column('tag', ForeignKey('tag.id_tag'), primary_key=True),
                       )

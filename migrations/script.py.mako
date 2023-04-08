@@ -1,3 +1,5 @@
+import sqlalchemy_utils
+
 """${message}
 
 Revision ID: ${up_revision}

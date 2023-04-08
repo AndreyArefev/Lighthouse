@@ -1,7 +1,7 @@
 from pydantic import BaseModel, AnyHttpUrl, Field
 from typing import List, Optional
 from datetime import datetime
-from ..Auth.schemas import User
+from ..Auth.schemas import BaseUser
 
 
 class Category(BaseModel):
@@ -26,4 +26,4 @@ class Event(BaseModel):
     age_limit: Optional[int]
     image: Optional[List[AnyHttpUrl]]
     link: Optional[AnyHttpUrl]
-    organizer: User
+    organizer: BaseUser
