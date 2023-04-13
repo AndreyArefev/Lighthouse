@@ -8,7 +8,7 @@ from src.database import Base
 #Base = declarative_base()
 
 
-class Event (Base):
+class Event(Base):
     __tablename__ = 'event'
     id_event = Column(Integer, primary_key=True)
     name_event = Column(String(200), nullable=False)
@@ -22,14 +22,14 @@ class Event (Base):
     age_limit = Column(Integer)
     image = Column(String)
     link = Column(String)
-    id_organizer = Column(Integer, ForeignKey('user.id_user'))
+    id_organizer = Column(Integer, ForeignKey('user.id'))
     organizer = relationship('User', back_populates='events')
 
 
 class Category(Base):
     __tablename__ = 'category'
     id_category = Column(Integer, primary_key=True)
-    name_category = Column(String, nullable=False)
+    name_category = Column(String, nullable=False, unique=True)
     events = relationship('Event', back_populates='category')
 
 
@@ -40,7 +40,7 @@ class Tag(Base):
     events = relationship('Event', secondary='tableEventTag', back_populates='tags')
 
 
-tableEventTag = Table('table_event_tag',
+tableEventTag = Table('tableEventTag',
                       Base.metadata,
                       Column('event', ForeignKey('event.id_event'), primary_key=True),
                       Column('tag', ForeignKey('tag.id_tag'), primary_key=True),
