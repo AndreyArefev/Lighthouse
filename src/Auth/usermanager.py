@@ -4,7 +4,6 @@ from fastapi_users import BaseUserManager, IntegerIDMixin, models, exceptions, s
 from .models import User
 from .service import get_user_db, CustomSQLAlchemyUserDatabase
 from .schemas import UserCreate
-from fastapi_users.db import SQLAlchemyUserDatabase
 
 SECRET = "SECRET"
 

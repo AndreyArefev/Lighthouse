@@ -1,13 +1,8 @@
 from datetime import datetime
-from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Text, Boolean
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
 from sqlalchemy.orm import relationship
-from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
-from sqlalchemy_utils import PhoneNumberType
+from fastapi_users.db import SQLAlchemyBaseUserTable
 from src.database import Base
-
-
-#Base = declarative_base()
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):

@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr, AnyHttpUrl, constr, Field
-from typing import List, Optional
+from pydantic import BaseModel, AnyHttpUrl, constr, Field
+from typing import Optional
 from datetime import date
 from fastapi_users import schemas
 

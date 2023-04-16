@@ -1,11 +1,6 @@
-from datetime import datetime
 from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Text, Boolean
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from src.database import Base
-
-
-#Base = declarative_base()
 
 
 class Event(Base):
@@ -36,7 +31,7 @@ class Category(Base):
 class Tag(Base):
     __tablename__ = 'tag'
     id_tag = Column(Integer, primary_key=True)
-    name_tag = Column(String(150), nullable=False)
+    name_tag = Column(String(150), nullable=False, unique=True)
     events = relationship('Event', secondary='tableEventTag', back_populates='tags')
 
 

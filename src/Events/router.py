@@ -3,14 +3,10 @@ from fastapi import APIRouter, Query, Response, status
 from datetime import date
 from .schemas import Event, Category, Tag, EventCreate
 from fastapi import Depends
-from src.Auth.router import current_user
+from src.Auth.base_config import current_user
 from src.Auth.models import User
 from .service import EventManager
-from src.database import get_async_session
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert, values
-from .models import Category as Cats
-from typing import AsyncGenerator
+
 
 router = APIRouter()
 
@@ -20,15 +16,15 @@ async def get_test(user: User = Depends(current_user),):
     return user.username
 
 
-@router.get('/')
-            #response_model=List[Event])
+@router.get('/',
+            response_model=List[Event])
 async def get_events(user: User = Depends(current_user), event_manager: EventManager = Depends()):
     all_events = await event_manager.get_events()
     return all_events
 
 
 @router.post('/',
-             #response_model=Event,
+             response_model=Event,
              status_code=status.HTTP_201_CREATED)
 async def create_event(event: EventCreate, user: User = Depends(current_user), event_manager: EventManager = Depends()):
     new_event = await event_manager.create_event(event, user)
