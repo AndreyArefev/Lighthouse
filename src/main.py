@@ -4,9 +4,9 @@ from fastapi_users import FastAPIUsers
 from src.Auth.models import User
 from src.Auth.schemas import UserRead, UserCreate
 from src.Auth.usermanager import get_user_manager
-from src.Auth.service import auth_backend
+from src.Auth.base_config import auth_backend
 from src.Events.router import router as event_router
-from src.Auth.router import fastapi_users
+from src.Auth.base_config import fastapi_users
 
 app = FastAPI(
     title='LighthouseAPI'

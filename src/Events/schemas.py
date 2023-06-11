@@ -42,5 +42,7 @@ class Event(EventCreate):
 
 
 
+
+
     class Config:
         orm_mode = True
