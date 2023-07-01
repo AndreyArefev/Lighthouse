@@ -20,6 +20,9 @@ class Event(Base):
     id_organizer = Column(Integer, ForeignKey('user.id'))
     organizer = relationship('User', back_populates='events')
 
+    def __str__(self):
+        return (f'{self.name_event}')
+
 
 class Category(Base):
     __tablename__ = 'category'
@@ -27,12 +30,18 @@ class Category(Base):
     name_category = Column(String, nullable=False, unique=True)
     events = relationship('Event', back_populates='category')
 
+    def __str__(self):
+        return (f'{self.name_category}')
+
 
 class Tag(Base):
     __tablename__ = 'tag'
     id_tag = Column(Integer, primary_key=True)
     name_tag = Column(String(150), nullable=False, unique=True)
     events = relationship('Event', secondary='tableEventTag', back_populates='tags')
+    
+    def __str__(self):
+        return (f'{self.name_tag}')
 
 
 tableEventTag = Table('tableEventTag',

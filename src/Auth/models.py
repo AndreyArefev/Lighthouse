@@ -18,3 +18,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_superuser: bool = Column(Boolean, default=False, nullable=False)
     is_verified: bool = Column(Boolean, default=False, nullable=False)
     events = relationship('Event', back_populates='organizer')
+
+    def __str__(self):
+        return (f'{self.username}')

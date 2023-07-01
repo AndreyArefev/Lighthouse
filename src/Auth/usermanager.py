@@ -21,10 +21,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ):
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
+
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
+        return token
 
     async def create(
         self,

@@ -7,6 +7,10 @@ from src.Auth.usermanager import get_user_manager
 from src.Auth.base_config import auth_backend
 from src.Events.router import router as event_router
 from src.Auth.base_config import fastapi_users
+from src.database import engine
+from sqladmin import Admin, ModelView
+from src.AdminPanel.views import UserAdmin, EventAdmin
+from src.AdminPanel.auth import authentication_backend
 
 app = FastAPI(
     title='LighthouseAPI'
@@ -37,3 +41,8 @@ app.include_router(
     prefix="/events",
     tags=['Events'],
 )
+
+
+admin = Admin(app, engine, authentication_backend=authentication_backend)
+admin.add_view(UserAdmin)
+admin.add_view(EventAdmin)

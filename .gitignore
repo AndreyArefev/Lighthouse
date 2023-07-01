@@ -4,3 +4,5 @@ migrations/__pycache__/
 src/Events/__pycache__/
 src/Auth/__pycache__/
 .idea/
+src/AdminPanel/__pycache__/
+src/for_test.py
