@@ -3,17 +3,20 @@ from fastapi import APIRouter, Query, Response, status
 from datetime import date
 from .schemas import Event, Category, Tag, EventCreate
 from fastapi import Depends
-from src.Auth.base_config import current_user
+from src.Auth.dependencies import get_current_active_user as current_user
 from src.Auth.models import User
 from .service import EventManager
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/events',
+    tags=['События']
+)
 
 
 @router.get('/test')
 async def get_test(user: User = Depends(current_user)):
-    return user.username
+    return user
 
 
 @router.get('/',

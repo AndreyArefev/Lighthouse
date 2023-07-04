@@ -1,11 +1,10 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
 from sqlalchemy.orm import relationship
-from fastapi_users.db import SQLAlchemyBaseUserTable
 from src.database import Base
 
 
-class User(SQLAlchemyBaseUserTable[int], Base):
+class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False)

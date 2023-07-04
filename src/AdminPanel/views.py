@@ -10,6 +10,7 @@ class UserAdmin(ModelView, model=User):
     name_plural = "Пользователи"
     icon = "fa-solid fa-user"
 
+
 class EventAdmin(ModelView, model=Event):
     column_list = [Event.id_event, Event.name_event]
     name = "Событие"

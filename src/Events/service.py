@@ -100,10 +100,10 @@ class EventManager:
 
     async def add_category(self, name_category):
         async with self.session as session:
-            query = insert(Category).values(name_category=name_category)
+            query = insert(Category).values(name_category=name_category).returning(Category)
             new_category = await self.session.execute(query)
             await session.commit()
-            return new_category
+            return new_category.scalar()
 
     async def get_events_category(self, id_category: int):
         async with self.session as session:

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, AnyHttpUrl, Field
 from typing import List, Optional
 from datetime import datetime
-from ..Auth.schemas import UserRead
+from ..Auth.schemas import SBaseInfoUser
 
 
 class CategoryCreate(BaseModel):
@@ -38,7 +38,7 @@ class EventCreate(BaseModel):
 class Event(EventCreate):
     id_event: int
     category: Category
-    organizer: UserRead
+    organizer: SBaseInfoUser
 
 
 

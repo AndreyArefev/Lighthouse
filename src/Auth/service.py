@@ -1,18 +1,46 @@
-from fastapi_users.db import SQLAlchemyUserDatabase
-from sqlalchemy import select
+import datetime
+from sqlalchemy import select, insert
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.Auth.models import User
+from src.Auth.schemas import SCreateUser
 from src.database import get_async_session
+from src.Auth.utils import get_password_hash, verify_password
 
 
-class CustomSQLAlchemyUserDatabase(SQLAlchemyUserDatabase):
-    async def get_by_username(self, username: str):
-        statement = select(self.user_table).where(
-            self.user_table.username == username
-        )
-        return await self._get_user(statement.limit(1))
+
+class UserManager:
+    """Класс отвечающий за работу с пользователями"""
+    def __init__(self, session: AsyncSession = Depends(get_async_session)):
+        self.session = session
+
+    async def find_user_one_or_none(self, **filter):
+        """Функция поиска пользователя по фильтру"""
+        async with self.session as session:
+            statement = select(User).filter_by(**filter)
+            result = await session.execute(statement)
+            return result.scalar_one_or_none()
+
+    async def create_user(self, user: SCreateUser):
+        async with self.session as session:
+            new_user = User(email=user.email,
+                            username=user.username,
+                            phone=user.phone,
+                            image=user.image,
+                            registered_at=datetime.date.today(),
+                            hashed_password=user.password,
+                            is_active=True,
+                            is_superuser=False,
+                            is_verified=False
+                            )
+            session.add(new_user)
+            await session.commit()
+            return new_user
+
+    async def auth_user(self, username: str, password: str) -> User | None:
+        user = await self.find_user_one_or_none(username=username)
+        if not user or not verify_password(password, user.hashed_password):
+            return None
+        return user
 
 
-async def get_user_db(session: AsyncSession = Depends(get_async_session)):
-    yield CustomSQLAlchemyUserDatabase(session, User)

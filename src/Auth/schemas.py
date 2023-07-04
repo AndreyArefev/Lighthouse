@@ -1,12 +1,16 @@
-from pydantic import BaseModel, AnyHttpUrl, constr, Field
+from pydantic import BaseModel, AnyHttpUrl, constr, Field, EmailStr, BaseSettings
 from typing import Optional
-from datetime import date
-from fastapi_users import schemas
+from datetime import date, timedelta
 
 
-class UserRead(schemas.BaseUser[int]):
+
+#class GetUserUsername(BaseModel):
+    #username: str = Field(min_length=2, max_length=100)
+
+
+class SBaseInfoUser(BaseModel):
     username: str = Field(min_length=2, max_length=100)
-    registered_at: date
+    email: EmailStr
     phone: constr(strip_whitespace=True,
                   regex=r"^(\+)[1-9][0-9\-\(\)\.]{9,15}$")
     image: AnyHttpUrl
@@ -15,20 +19,25 @@ class UserRead(schemas.BaseUser[int]):
         orm_mode = True
 
 
-class UserCreate(schemas.BaseUserCreate):
-    username: str = Field(min_length=2, max_length=100)
-    password: str
-    phone: constr(strip_whitespace=True,
-                  regex=r"^(\+)[1-9][0-9\-\(\)\.]{9,15}$")
-    image: Optional[AnyHttpUrl]
+class SGetUser(SBaseInfoUser):
+    id: int
+    registered_at: date
+    is_active: bool
+    is_verified: bool
+    is_superuser: bool
+
+    class Config:
+        orm_mode = True
 
 
-class UserUpdate(schemas.BaseUserUpdate):
+class SCreateUser(SBaseInfoUser):
+    password: str = Field(min_length=6, max_length=20)
+
+
+class SUpdateUser(BaseModel):
     password: Optional[str]
     phone: Optional[constr(strip_whitespace=True,
                            regex=r"^(\+)[1-9][0-9\-\(\)\.]{9,15}$")]
     image: Optional[AnyHttpUrl]
 
 
-class GetUser(BaseModel):
-    username: str = Field(min_length=2, max_length=100)

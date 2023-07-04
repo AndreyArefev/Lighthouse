@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+from datetime import timedelta
+
 import os
 
 load_dotenv()
@@ -10,3 +12,12 @@ DB_PASS = os.environ.get("DB_PASS")
 DB_NAME = os.environ.get("DB_NAME")
 DB_URL = os.environ.get("DB_URL")
 PRIVATE_KEY = os.environ.get("PRIVATE_KEY")
+AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+AUTHJWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+SECRET_KEY='secret'
+ALGORITHM='HS256'
+
+
+
+
+
