@@ -1,3 +1,6 @@
 from celery import Celery
+from src.config import REDIS_PORT, REDIS_HOST
 
-celery = Celery("tasks", broker="redis://localhost:6379", include=["src.Tasks.tasks"])
+celery = Celery("tasks",
+                broker=f"redis://{REDIS_HOST}:{REDIS_PORT}",
+                include=["src.Tasks.tasks"])

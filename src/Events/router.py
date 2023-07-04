@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Query, Response, status
+from fastapi import APIRouter, Query, status
 from datetime import date
 from .schemas import Event, Category, Tag, EventCreate
 from fastapi import Depends

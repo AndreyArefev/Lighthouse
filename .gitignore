@@ -6,3 +6,4 @@ src/Auth/__pycache__/
 .idea/
 src/AdminPanel/__pycache__/
 src/for_test.py
+tasks

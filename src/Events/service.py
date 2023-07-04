@@ -8,13 +8,16 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import insert, select
 from sqlalchemy.orm import selectinload
+from fastapi_cache.decorator import cache
 
 
 class EventManager:
     """Класс отвечающий за работу с событиями"""
-    def __init__(self, session: AsyncSession = Depends(get_async_session)):
+    def __init__(self,
+                 session: AsyncSession = Depends(get_async_session)):
         self.session = session
 
+    @cache(expire=20)
     async def get_events(self) -> [Event]:
         """Получение всех событий"""
         async with self.session as session:
@@ -27,7 +30,8 @@ class EventManager:
             events = result.scalars().all()
             return events
 
-    async def get_user_events(self, user_id: int) -> [Event]:
+    async def get_user_events(self,
+                              user_id: int) -> [Event]:
         """Получение всех событий конкретного пользователя"""
         async with self.session as session:
             query = select(Event)\
@@ -40,7 +44,9 @@ class EventManager:
             events = result.scalars().all()
             return events
 
-    async def create_event(self, event: EventCreate, user: User) -> Event:
+    async def create_event(self,
+                           event: EventCreate,
+                           user: User) -> Event:
         """Добавление своего события"""
         async with self.session as session:
             category = await self._get_category(event.category.name_category)
