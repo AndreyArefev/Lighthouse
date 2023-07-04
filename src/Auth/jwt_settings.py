@@ -12,7 +12,6 @@ class SSettings(BaseModel):
     authjwt_refresh_cookie_key: str = 'refresh_token'
     authjwt_secret_key: str = conf.SECRET_KEY
     authjwt_algorithm: str = conf.ALGORITHM
-    #authjwt_token_location: set = {"cookies"}
     authjwt_cookie_csrf_protect: bool = False
 
 

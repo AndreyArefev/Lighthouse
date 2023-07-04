@@ -1,20 +1,21 @@
-from fastapi import FastAPI, HTTPException, Depends, Request, Response, APIRouter
+from fastapi import HTTPException, Depends, Response, APIRouter
 from src.Auth.schemas import SCreateUser
 from src.Auth.jwt_settings import AuthJWT
 import src.exception as ex
 from src.Auth.utils import get_password_hash
 from src.Auth.service import UserManager
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing import Annotated
+from fastapi.security import OAuth2PasswordRequestForm
+
 
 router = APIRouter(
     prefix="/auth",
     tags=["Аутентификация"]
 )
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 @router.post("/register")
-async def register_user(user_date: SCreateUser, usermanager: UserManager = Depends()):
+async def register_user(user_date: SCreateUser,
+                        usermanager: UserManager = Depends()):
     if await usermanager.find_user_one_or_none(username=user_date.username):
         raise ex.ExceptionUsernameAlreadyExists
     if await usermanager.find_user_one_or_none(email=user_date.email):
@@ -24,10 +25,9 @@ async def register_user(user_date: SCreateUser, usermanager: UserManager = Depen
 
 
 @router.post('/login')
-async def login(response: Response,
-          form_data: OAuth2PasswordRequestForm = Depends(),
-          authorize: AuthJWT = Depends(),
-          usermanager: UserManager = Depends()):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(),
+                authorize: AuthJWT = Depends(),
+                usermanager: UserManager = Depends()):
     user = await usermanager.auth_user(username=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(status_code=401, detail='Логин или пароль неверны')
@@ -39,7 +39,6 @@ async def login(response: Response,
     authorize.set_refresh_cookies(refresh_token)
     #response.set_cookie("access_token", access_token, httponly=True)
     #response.set_cookie("csrf_refresh_token", refresh_token, httponly=True)
-    #response.set_cookie('logged_in', 'True')
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 
@@ -51,21 +50,8 @@ def refresh(authorize: AuthJWT = Depends()):
     authorize.set_access_cookies(new_access_token)
     return {"access_token": new_access_token}
 
-@router.get('/protected')
-def protected(Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
-    current_user = Authorize.get_jwt_subject()
-    return {"user": current_user}
 
 @router.get('/logout')
-def logout(response: Response,
-           authorize: AuthJWT = Depends()):
-           #user_id: str = Depends(oauth2.require_user)):
+def logout(authorize: AuthJWT = Depends()):
     authorize.unset_jwt_cookies()
-    response.set_cookie('logged_in', '', -1)
-
     return {'status': 'success'}
-
-
-
-

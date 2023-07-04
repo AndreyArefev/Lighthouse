@@ -1,11 +1,11 @@
 import datetime
-from sqlalchemy import select, insert
+from sqlalchemy import select
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.Auth.models import User
 from src.Auth.schemas import SCreateUser
 from src.database import get_async_session
-from src.Auth.utils import get_password_hash, verify_password
+from src.Auth.utils import verify_password
 
 
 
@@ -14,14 +14,14 @@ class UserManager:
     def __init__(self, session: AsyncSession = Depends(get_async_session)):
         self.session = session
 
-    async def find_user_one_or_none(self, **filter):
+    async def find_user_one_or_none(self, **filter) -> User | None:
         """Функция поиска пользователя по фильтру"""
         async with self.session as session:
             statement = select(User).filter_by(**filter)
             result = await session.execute(statement)
             return result.scalar_one_or_none()
 
-    async def create_user(self, user: SCreateUser):
+    async def create_user(self, user: SCreateUser) -> User:
         async with self.session as session:
             new_user = User(email=user.email,
                             username=user.username,
@@ -42,5 +42,3 @@ class UserManager:
         if not user or not verify_password(password, user.hashed_password):
             return None
         return user
-
-

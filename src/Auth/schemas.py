@@ -3,11 +3,6 @@ from typing import Optional
 from datetime import date, timedelta
 
 
-
-#class GetUserUsername(BaseModel):
-    #username: str = Field(min_length=2, max_length=100)
-
-
 class SBaseInfoUser(BaseModel):
     username: str = Field(min_length=2, max_length=100)
     email: EmailStr
