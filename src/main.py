@@ -9,6 +9,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 from redis import asyncio as aioredis
+from src.config import REDIS_HOST
 
 app = FastAPI(
     title='LighthouseAPI'
@@ -28,6 +29,6 @@ admin.add_view(EventAdmin)
 
 @app.on_event("startup")
 async def startup():
-    redis = aioredis.from_url("redis://localhost")
+    redis = aioredis.from_url(f"redis://{REDIS_HOST}")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 

@@ -5,7 +5,7 @@ import src.exception as ex
 from src.Auth.utils import get_password_hash
 from src.Auth.service import UserManager
 from fastapi.security import OAuth2PasswordRequestForm
-
+from src.Tasks.tasks import send_verified_email
 
 router = APIRouter(
     prefix="/auth",
@@ -17,10 +17,11 @@ router = APIRouter(
 async def register_user(user_date: SCreateUser,
                         usermanager: UserManager = Depends()):
     if await usermanager.find_user_one_or_none(username=user_date.username):
-        raise ex.ExceptionUsernameAlreadyExists
+        raise ex.ExUsernameAlreadyExists
     if await usermanager.find_user_one_or_none(email=user_date.email):
-        raise ex.ExceptionEmailAlreadyExists
+        raise ex.ExEmailAlreadyExists
     user_date.password = get_password_hash(user_date.password)
+    send_verified_email.delay(user_date.email)
     await usermanager.create_user(user_date)
 
 

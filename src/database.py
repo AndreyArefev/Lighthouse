@@ -3,9 +3,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from typing import AsyncGenerator
 
-from .config import DB_URL
+from .config import DB_URL, TEST_DB_URL, MODE
 
-DATABASE_URL = f"sqlite+aiosqlite:///{DB_URL}"
+if MODE == "TEST":
+    DATABASE_URL = f"sqlite+aiosqlite:///{TEST_DB_URL}"
+else:
+    DATABASE_URL = f"sqlite+aiosqlite:///{DB_URL}"
+
+
 Base = declarative_base() #class Base(DeclarativeBase): pass
 
 engine = create_async_engine(DATABASE_URL,

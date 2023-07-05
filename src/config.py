@@ -1,21 +1,36 @@
 from dotenv import load_dotenv
 from datetime import timedelta
+from os import environ as env
 
-import os
 
 load_dotenv()
 
-DB_HOST = os.environ.get("DB_HOST")
-DB_PORT = os.environ.get("DB_PORT")
-DB_USER = os.environ.get("DB_USER")
-DB_PASS = os.environ.get("DB_PASS")
-DB_NAME = os.environ.get("DB_NAME")
-DB_URL = os.environ.get("DB_URL")
+MODE = env.get("MODE") #DEV
 
-REDIS_HOST = os.environ.get("REDIS_HOST")
-REDIS_PORT = os.environ.get("REDIS_PORT")
+DB_HOST = env.get("DB_HOST")
+DB_PORT = env.get("DB_PORT")
+DB_USER = env.get("DB_USER")
+DB_PASS = env.get("DB_PASS")
+DB_NAME = env.get("DB_NAME")
+DB_URL = env.get("DB_URL")
 
-PRIVATE_KEY = os.environ.get("PRIVATE_KEY")
+
+TEST_DB_HOST = env.get("TEST_DB_HOST")
+TEST_DB_PORT = env.get("TEST_DB_PORT")
+TEST_DB_USER = env.get("TEST_DB_USER")
+TEST_DB_PASS = env.get("TEST_DB_PASS")
+TEST_DB_NAME = env.get("TEST_DB_NAME")
+TEST_DB_URL = env.get("TEST_DB_URL")
+
+REDIS_HOST = env.get("REDIS_HOST")
+REDIS_PORT = env.get("REDIS_PORT")
+
+SMTP_HOST = env.get("SMTP_HOST")
+SMTP_PORT = env.get("SMTP_PORT")
+SMTP_USER = env.get("SMTP_USER")
+SMTP_PASS = env.get("SMTP_PASS")
+
+PRIVATE_KEY = env.get("PRIVATE_KEY")
 AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
 AUTHJWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 SECRET_KEY='secret'
