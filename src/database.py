@@ -2,21 +2,28 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from typing import AsyncGenerator
+from sqlalchemy import NullPool
 
 from .config import DB_URL, TEST_DB_URL, MODE
 
 if MODE == "TEST":
     DATABASE_URL = f"sqlite+aiosqlite:///{TEST_DB_URL}"
+    DATABASE_PARAMS = {"poolclass": NullPool}
 else:
     DATABASE_URL = f"sqlite+aiosqlite:///{DB_URL}"
+    DATABASE_PARAMS = {}
 
 
-Base = declarative_base() #class Base(DeclarativeBase): pass
+Base = declarative_base()
+#class Base(DeclarativeBase): pass
 
 engine = create_async_engine(DATABASE_URL,
                              echo=True,
-                             )
-async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+                             **DATABASE_PARAMS)
+
+async_session_maker = sessionmaker(engine,
+                                   class_=AsyncSession,
+                                   expire_on_commit=False)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

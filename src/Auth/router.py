@@ -2,10 +2,12 @@ from fastapi import HTTPException, Depends, Response, APIRouter
 from src.Auth.schemas import SCreateUser
 from src.Auth.jwt_settings import AuthJWT
 import src.exception as ex
-from src.Auth.utils import get_password_hash
+from src.Auth.utils import get_password_hash, create_confirm_token
 from src.Auth.service import UserManager
 from fastapi.security import OAuth2PasswordRequestForm
 from src.Tasks.tasks import send_verified_email
+from src.Auth.dependencies import get_current_user
+
 
 router = APIRouter(
     prefix="/auth",
@@ -21,7 +23,8 @@ async def register_user(user_date: SCreateUser,
     if await usermanager.find_user_one_or_none(email=user_date.email):
         raise ex.ExEmailAlreadyExists
     user_date.password = get_password_hash(user_date.password)
-    send_verified_email.delay(user_date.email)
+    confirm_token = create_confirm_token(user_date.username)
+    send_verified_email.delay(user_date.email, confirm_token)
     await usermanager.create_user(user_date)
 
 
@@ -43,8 +46,16 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 
+@router.post('/verification/{token}')
+async def verefication(token: str,
+                       usermanager: UserManager = Depends()):
+    user = await get_current_user(token=token)
+    await usermanager.verified_user(user)
+    return {'Верификация': user.is_verified}
+
+
 @router.post('/refresh')
-def refresh(authorize: AuthJWT = Depends()):
+async def refresh(authorize: AuthJWT = Depends()):
     authorize.jwt_refresh_token_required()
     current_user = authorize.get_jwt_subject()
     new_access_token = authorize.create_access_token(subject=current_user)
@@ -53,6 +64,6 @@ def refresh(authorize: AuthJWT = Depends()):
 
 
 @router.get('/logout')
-def logout(authorize: AuthJWT = Depends()):
+async def logout(authorize: AuthJWT = Depends()):
     authorize.unset_jwt_cookies()
     return {'status': 'success'}

@@ -6,6 +6,7 @@ from src.Auth.models import User
 from src.Auth.schemas import SCreateUser
 from src.database import get_async_session
 from src.Auth.utils import verify_password
+from fastapi.templating import Jinja2Templates
 
 
 
@@ -42,3 +43,12 @@ class UserManager:
         if not user or not verify_password(password, user.hashed_password):
             return None
         return user
+
+    async def verified_user(self, user: User) -> Jinja2Templates.TemplateResponse:
+        async with self.session as session:
+            setattr(user, user.is_verified, True)
+            await session.commit()
+        templates = Jinja2Templates(directory="src/templates")
+        resp = templates.TemplateResponse("page_verification_confirmations.html",
+                                   {"username": user.username})
+        return resp
