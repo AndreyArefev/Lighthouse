@@ -47,7 +47,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
 
 
 @router.post('/verification/{token}')
-async def verefication(token: str,
+async def verification(token: str,
                        usermanager: UserManager = Depends()):
     user = await get_current_user(token=token)
     await usermanager.verified_user(user)
