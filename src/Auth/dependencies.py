@@ -21,14 +21,9 @@ def get_token(request: Request) -> str:
 async def get_current_user(token: str = Depends(get_token),
                            usermanager: UserManager = Depends()) -> User:
     """Получение текущего пользователя по его токену"""
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise ExCredentials
-    except JWTError:
-        raise ExCredentials
+    username = await usermanager.get_username_from_token(token=token)
     user = await usermanager.find_user_one_or_none(username=username)
+    print('!@#')
     if user is None:
         raise ExCredentials
     return user
@@ -46,3 +41,6 @@ async def get_current_superuser(current_user: Annotated[User, Depends(get_curren
     if not current_user.is_superuser:
         raise ExNotAdmin
     return current_user
+
+
+

@@ -7,6 +7,7 @@ from src.Auth.service import UserManager
 from fastapi.security import OAuth2PasswordRequestForm
 from src.Tasks.tasks import send_verified_email
 from src.Auth.dependencies import get_current_user
+from src.Auth.models import User
 
 
 router = APIRouter(
@@ -46,12 +47,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 
-@router.post('/verification/{token}')
+@router.get('/verification/')
 async def verification(token: str,
                        usermanager: UserManager = Depends()):
-    user = await get_current_user(token=token)
-    await usermanager.verified_user(user)
-    return {'Верификация': user.is_verified}
+    template = await usermanager.verified_user(token)
+    return template
 
 
 @router.post('/refresh')

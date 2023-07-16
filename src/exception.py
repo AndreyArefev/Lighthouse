@@ -39,3 +39,7 @@ ExIncorrectLoginOrPassword = HTTPException(
 ExTokenExpired = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Токен истек")
+
+ExIncorrectTokenVerification = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Для верификации аккаунта используйте ссылку в входящем e-mail")
