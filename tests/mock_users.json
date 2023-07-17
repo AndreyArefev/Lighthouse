@@ -10,7 +10,7 @@
   "is_active": true,
   "is_superuser": true,
   "is_verified": true
-},
+  },
   {
   "image": "https://habr.com/ru/articles/269347/",
   "hashed_password": "$2b$12$3ua4q0QdSJnOe/Od.DRqkuF82WDgrMDFmBHmgT.W/2IlQjCZ9LYSW",
@@ -22,5 +22,5 @@
   "registered_at": "2023-07-16",
   "is_active": true,
   "is_verified": true
-}
+  }
 ]

@@ -7,6 +7,9 @@ from sqlalchemy import insert
 from src.Auth.models import User
 from src.Events.models import Event, Tag, Category, tableEventTag
 from datetime import datetime
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
+from src.main import app as fastapi_app
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -17,10 +20,6 @@ async def prepare_database():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-
-    def open_mock_json(model: str):
-        with open(f'tests/mock_{model}.json', 'r', encoding='utf-8') as file:
-            return json.load(file)
 
     users = open_mock_json('users')
     events = open_mock_json('events')
@@ -49,6 +48,23 @@ async def prepare_database():
         await session.execute(add_reletionship_event_tag)
 
         await session.commit()
+
+
+def open_mock_json(model: str):
+    with open(f'tests/mock_{model}.json', 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+
+@pytest.fixture(scope="function")
+async def ac():
+    async with AsyncClient(app=fastapi_app, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest.fixture(scope="function")
+async def session():
+    async with async_session_maker() as session:
+        yield session
 
 
 @pytest.fixture(scope="session")
