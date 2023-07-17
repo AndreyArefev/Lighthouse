@@ -9,13 +9,15 @@ from .config import DB_URL, TEST_DB_URL, MODE
 if MODE == "TEST":
     DATABASE_URL = f"sqlite+aiosqlite:///{TEST_DB_URL}"
     DATABASE_PARAMS = {"poolclass": NullPool}
+    print(MODE)
 else:
     DATABASE_URL = f"sqlite+aiosqlite:///{DB_URL}"
     DATABASE_PARAMS = {}
 
 
-Base = declarative_base()
-#class Base(DeclarativeBase): pass
+class Base(DeclarativeBase):
+    pass
+
 
 engine = create_async_engine(DATABASE_URL,
                              echo=True,
