@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Depends, Response, APIRouter
-from src.Auth.schemas import SCreateUser
+from src.Auth.schemas import SCreateUser, SAuthUser
 from src.Auth.jwt_settings import AuthJWT
 import src.exception as ex
 from src.Auth.utils import get_password_hash, create_confirm_token
@@ -30,7 +30,8 @@ async def register_user(user_date: SCreateUser,
 
 
 @router.post('/login')
-async def login(form_data: OAuth2PasswordRequestForm = Depends(),
+async def login(#form_data: OAuth2PasswordRequestForm = Depends(),
+                form_data: SAuthUser,
                 authorize: AuthJWT = Depends(),
                 usermanager: UserManager = Depends()):
     user = await usermanager.auth_user(username=form_data.username, password=form_data.password)
