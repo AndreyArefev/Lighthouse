@@ -6,7 +6,7 @@ from .schemas import EventCreate
 from src.database import async_session_maker
 from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 from sqlalchemy.orm import selectinload
 from fastapi_cache.decorator import cache
 
@@ -86,12 +86,13 @@ class EventManager:
     async def put_event(cls, new_event_info: EventCreate, id_event: int, user: User) -> Event | None:
         """Изменение события по id"""
         async with async_session_maker() as session:
-            event = await cls._get_event_for_update(id_event, user)
-            new_event_info.category = await cls._get_category(session, new_event_info.category.name_category)
-            new_event_info.tags = await cls.tag_get_or_create(session, new_event_info.tags)
+            event = await cls._get_event_for_update(session, id_event, user)
+            new_event_info.category = await cls._get_category_event(session, new_event_info.category.name_category)
+            new_event_info.tags = await cls._get_list_tags_for_event(session, new_event_info.tags)
             if event:
                 for field, value in new_event_info:
                     setattr(event, field, value)
+                session.add(event)
                 await session.commit()
                 return event
             else:
@@ -126,23 +127,21 @@ class EventManager:
             return category
 
     @classmethod
-    async def _get_category(cls, session, name_category: str):
+    async def _get_category_event(cls, session, name_category: str):
         query = select(Category).where(Category.name_category == name_category)
         result = await session.execute(query)
         category = result.scalars().first()
         return category
 
     @classmethod
-    async def tag_get_or_create(cls, session, tags):
+    async def _get_list_tags_for_event(cls, session, tags):
         list_tag = []
         for tag in tags:
             query = select(Tag).where(Tag.name_tag == tag.name_tag)
             result = await session.execute(query)
             new_tag = result.scalars().first()
             if not new_tag:
-                new_tag = Tag(name_tag=tag.name_tag)
-                session.add(new_tag)
-                await session.flush()
+                await cls._create_tag(new_tag, session)
             list_tag.append(new_tag)
         return list_tag
 
@@ -158,19 +157,21 @@ class EventManager:
     def get_events_selected_user(cls, id_user: int):
         pass
 
+    @staticmethod
+    async def _create_tag(tag: Tag, session: AsyncSession):
+        new_tag = Tag(name_tag=tag.name_tag)
+        session.add(new_tag)
+        await session.flush()
+
     @classmethod
-    async def _get_event_for_update(cls, id_event: int, user: User):
+    async def _get_event_for_update(cls, session, id_event: int, user: User):
         """Получение события по id"""
-        async with async_session_maker() as session:
-            query = select(Event)\
-                .where(Event.id_event == id_event and Event.id_organizer == user.id) \
-                .order_by(Event.time_event)\
-                .options(selectinload(Event.category))\
-                .options(selectinload(Event.organizer))\
-                .options(selectinload(Event.tags))
-            result = await session.execute(query)
-            event = result.scalars().first()
-            return event if event else None
-
-
-
+        query = select(Event)\
+            .where(Event.id_event == id_event and Event.id_organizer == user.id) \
+            .order_by(Event.time_event)\
+            .options(selectinload(Event.category))\
+            .options(selectinload(Event.organizer))\
+            .options(selectinload(Event.tags))
+        result = await session.execute(query)
+        event = result.scalars().first()
+        return event if event else None

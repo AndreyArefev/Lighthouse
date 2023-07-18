@@ -67,6 +67,7 @@ class UserManager:
             await session.execute(statement)
             await session.commit()
 
+
     @staticmethod
     async def get_username_from_token(token: str):
         "Получение имени пользователя из токена"

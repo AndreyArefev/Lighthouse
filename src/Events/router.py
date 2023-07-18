@@ -21,18 +21,16 @@ async def get_test(user: User = Depends(current_user)):
 
 @router.get('/',
             response_model=List[Event])
-async def get_events(user: User = Depends(current_user),
-                     event_manager: EventManager = Depends()):
-    all_events = await event_manager.get_events()
+async def get_events(user: User = Depends(current_user)):
+    all_events = await EventManager.get_events()
     return all_events
 
 
 @router.get('/{user_id}/',
             response_model=List[Event])
 async def get_events(user_id: int,
-                     user: User = Depends(current_user),
-                     event_manager: EventManager = Depends()):
-    all_user_events = await event_manager.get_user_events(user_id)
+                     user: User = Depends(current_user)):
+    all_user_events = await EventManager.get_user_events(user_id)
     return all_user_events
 
 
@@ -40,18 +38,16 @@ async def get_events(user_id: int,
              response_model=Event,
              status_code=status.HTTP_201_CREATED)
 async def create_event(event: EventCreate,
-                       user: User = Depends(current_user),
-                       event_manager: EventManager = Depends()):
-    new_event = await event_manager.create_event(event, user)
+                       user: User = Depends(current_user)):
+    new_event = await EventManager.create_event(event, user)
     return new_event
 
 
 @router.get('/{id_event}',
             response_model=Event | str)
 async def get_event(id_event: int,
-                    user: User = Depends(current_user),
-                    event_manager: EventManager = Depends()):
-    event = await event_manager.get_event(id_event)
+                    user: User = Depends(current_user)):
+    event = await EventManager.get_event(id_event)
     return event if event else 'Событие отсутствует'
 
 
@@ -59,9 +55,8 @@ async def get_event(id_event: int,
             response_model=Event | str)
 async def put_event(event: EventCreate,
                     id_event: int,
-                    user: User = Depends(current_user),
-                    event_manager: EventManager = Depends()):
-    event = await event_manager.put_event(event, id_event, user)
+                    user: User = Depends(current_user)):
+    event = await EventManager.put_event(event, id_event, user)
     return event if event else 'Вы не можете изменить данное событие'
 
 
