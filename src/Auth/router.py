@@ -17,24 +17,22 @@ router = APIRouter(
 
 
 @router.post("/register")
-async def register_user(user_date: SCreateUser,
-                        usermanager: UserManager = Depends()):
-    if await usermanager.find_user_one_or_none(username=user_date.username):
+async def register_user(user_date: SCreateUser):
+    if await UserManager.find_user_one_or_none(username=user_date.username):
         raise ex.ExUsernameAlreadyExists
-    if await usermanager.find_user_one_or_none(email=user_date.email):
+    if await UserManager.find_user_one_or_none(email=user_date.email):
         raise ex.ExEmailAlreadyExists
     user_date.password = get_password_hash(user_date.password)
     confirm_token = create_confirm_token(user_date.username)
     send_verified_email.delay(user_date.email, confirm_token)
-    await usermanager.create_user(user_date)
+    await UserManager.create_user(user_date)
 
 
 @router.post('/login')
 async def login(#form_data: OAuth2PasswordRequestForm = Depends(),
                 form_data: SAuthUser,
-                authorize: AuthJWT = Depends(),
-                usermanager: UserManager = Depends()):
-    user = await usermanager.auth_user(username=form_data.username, password=form_data.password)
+                authorize: AuthJWT = Depends()):
+    user = await UserManager.auth_user(username=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(status_code=401, detail='Логин или пароль неверны')
     if not user.is_verified:
@@ -49,9 +47,8 @@ async def login(#form_data: OAuth2PasswordRequestForm = Depends(),
 
 
 @router.get('/verification/')
-async def verification(token: str,
-                       usermanager: UserManager = Depends()):
-    template = await usermanager.verified_user(token)
+async def verification(token: str):
+    template = await UserManager.verified_user(token)
     return template
 
 
