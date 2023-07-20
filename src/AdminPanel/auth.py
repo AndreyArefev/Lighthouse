@@ -1,23 +1,19 @@
 from typing import Optional
 
-from jose import jwt
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
-from starlette.responses import RedirectResponse, Response
+from starlette.responses import RedirectResponse
 
 from src.Auth.jwt_settings import AuthJWT
 from src.Auth.service import UserManager
-from src.config import ALGORITHM, SECRET_KEY
-from src.database import async_session_maker, get_async_session
 
 
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
         username, password = form["username"], form["password"]
-        usermanager = UserManager(session=async_session_maker())
         authorize = AuthJWT()
-        user = await usermanager.auth_user(username, password)
+        user = await UserManager.auth_user(username, password)
         if user and user.is_superuser:
             access_token = authorize.create_access_token(subject=user.username)
             request.session.update({"token": access_token})

@@ -7,7 +7,6 @@ from sqlalchemy import insert
 from src.Auth.models import User
 from src.Events.models import Event, Tag, Category, tableEventTag
 from datetime import datetime
-from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from src.main import app as fastapi_app
 
@@ -66,7 +65,6 @@ async def ac_auth_client():
         await ac_auth.post('auth/login', json=users[0])
         assert ac_auth.cookies['access_token']
         yield ac_auth
-
 
 
 @pytest.fixture(scope="function")

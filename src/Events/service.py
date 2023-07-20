@@ -1,9 +1,7 @@
 from datetime import date
-from typing import Any
 
-from fastapi import Depends, HTTPException
 from fastapi_cache.decorator import cache
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -52,8 +50,8 @@ class EventManager:
                            user: User) -> Event:
         """Добавление своего события"""
         async with async_session_maker() as session:
-            category = await cls._get_category(session, event.category.name_category)
-            tags = await cls.tag_get_or_create(session, event.tags)
+            category = await cls._get_category_event(session, event.category.name_category)
+            tags = await cls._get_list_tags_for_event(session, event.tags)
             new_event = Event(name_event=event.name_event,
                               category=category,
                               tags=tags,

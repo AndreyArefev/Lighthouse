@@ -14,7 +14,6 @@ DB_PASS = env.get("DB_PASS")
 DB_NAME = env.get("DB_NAME")
 DB_URL = env.get("DB_URL")
 
-
 TEST_DB_HOST = env.get("TEST_DB_HOST")
 TEST_DB_PORT = env.get("TEST_DB_PORT")
 TEST_DB_USER = env.get("TEST_DB_USER")
@@ -35,9 +34,3 @@ AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
 AUTHJWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 SECRET_KEY='secret'
 ALGORITHM='HS256'
-
-
-
-
-
-

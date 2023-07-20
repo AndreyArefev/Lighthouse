@@ -1,5 +1,4 @@
 import smtplib
-from typing import Annotated
 
 from src.config import SMTP_HOST, SMTP_PASS, SMTP_PORT, SMTP_USER
 from src.Tasks.app_celery import celery

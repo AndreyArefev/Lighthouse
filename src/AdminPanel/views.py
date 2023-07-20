@@ -13,7 +13,18 @@ class UserAdmin(ModelView, model=User):
 
 
 class EventAdmin(ModelView, model=Event):
-    column_list = [Event.id_event, Event.name_event]
+    column_list = [Category.id_category, Category.name_category]
     name = "Событие"
     name_plural = "События"
 
+
+class CategoryAdmin(ModelView, model=Category):
+    column_list = [Tag.id_tag, Tag.name_tag]
+    name = "Категория"
+    name_plural = "Категории"
+
+
+class TagAdmin(ModelView, model=Tag):
+    column_list = [Event.id_event, Event.name_event]
+    name = "Тег"
+    name_plural = "Теги"

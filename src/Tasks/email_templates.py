@@ -13,7 +13,6 @@ def create_verified_email(email_to, email_from, confirm_token):
     email["Subject"] = "Верификация пользователя"
     email["From"] = SMTP_USER
     email["To"] = email_to
-    email.set_content(template.render(token=confirm_token),
-                      subtype='html')
+    email.set_content(template.render(token=confirm_token), subtype='html')
     return email
 

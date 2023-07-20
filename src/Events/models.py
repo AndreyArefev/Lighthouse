@@ -1,49 +1,49 @@
-from sqlalchemy import (TIMESTAMP, Column, ForeignKey, Integer,
-                        String, Table, Text)
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, String, Table
+from sqlalchemy.orm import relationship, mapped_column, Mapped
+from datetime import datetime
 
 from src.database import Base
 
 
 class Event(Base):
     __tablename__ = 'event'
-    id_event = Column(Integer, primary_key=True)
-    name_event = Column(String(200), nullable=False)
-    id_category = Column(Integer, ForeignKey('category.id_category'))
+    id_event: Mapped[int] = mapped_column(primary_key=True)
+    name_event: Mapped[str] = mapped_column(String(200), nullable=False)
+    id_category: Mapped[int] = mapped_column(ForeignKey('category.id_category'))
     category = relationship('Category', back_populates='events')
     tags = relationship('Tag', secondary='tableEventTag', back_populates='events')
-    time_event = Column(TIMESTAMP)
-    place_event = Column(String)
-    about_event = Column(Text)
-    price = Column(Integer)
-    age_limit = Column(Integer)
-    image = Column(String)
-    link = Column(String)
-    id_organizer = Column(Integer, ForeignKey('user.id'))
+    time_event: Mapped[datetime]
+    place_event: Mapped[str]
+    about_event: Mapped[str]
+    price: Mapped[int]
+    age_limit: Mapped[int]
+    image: Mapped[str]
+    link: Mapped[str]
+    id_organizer: Mapped[int] = mapped_column(ForeignKey('user.id'))
     organizer = relationship('User', back_populates='events')
 
     def __str__(self):
-        return (f'{self.name_event}')
+        return self.name_event
 
 
 class Category(Base):
     __tablename__ = 'category'
-    id_category = Column(Integer, primary_key=True)
-    name_category = Column(String, nullable=False, unique=True)
+    id_category: Mapped[int] = mapped_column(primary_key=True)
+    name_category: Mapped[str] = mapped_column(nullable=False, unique=True)
     events = relationship('Event', back_populates='category')
 
     def __str__(self):
-        return (f'{self.name_category}')
+        return self.name_category
 
 
 class Tag(Base):
     __tablename__ = 'tag'
-    id_tag = Column(Integer, primary_key=True)
-    name_tag = Column(String(150), nullable=False, unique=True)
+    id_tag: Mapped[int] = mapped_column(primary_key=True)
+    name_tag: Mapped[str] = mapped_column(String(150), nullable=False, unique=True)
     events = relationship('Event', secondary='tableEventTag', back_populates='tags')
     
     def __str__(self):
-        return (f'{self.name_tag}')
+        return self.name_tag
 
 
 tableEventTag = Table('tableEventTag',

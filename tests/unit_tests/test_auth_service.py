@@ -1,4 +1,5 @@
 import pytest
+
 from src.Auth.service import UserManager
 from tests.conftest import open_mock_json
 
