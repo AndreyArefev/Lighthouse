@@ -1,7 +1,10 @@
 from datetime import timedelta
+
 from fastapi_jwt_auth import AuthJWT
-from pydantic import BaseSettings, BaseModel
+from pydantic import BaseModel
+
 import src.config as conf
+
 
 class SSettings(BaseModel):
     """Настройки по созданию JWT токенов"""

@@ -1,6 +1,8 @@
-from pydantic import BaseModel, AnyHttpUrl, constr, Field, EmailStr, BaseSettings
-from typing import Optional
 from datetime import date, timedelta
+from typing import Optional
+
+from pydantic import (AnyHttpUrl, BaseModel, BaseSettings, EmailStr, Field,
+                      constr)
 
 
 class SAuthUser(BaseModel):

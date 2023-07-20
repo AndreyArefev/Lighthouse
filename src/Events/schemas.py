@@ -1,6 +1,8 @@
-from pydantic import BaseModel, AnyHttpUrl, Field
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
+
+from pydantic import AnyHttpUrl, BaseModel, Field
+
 from ..Auth.schemas import SBaseInfoUser
 
 

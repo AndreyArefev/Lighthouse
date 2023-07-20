@@ -1,13 +1,14 @@
-from src.database import get_async_session
 from typing import Optional
+
+from jose import jwt
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
-from jose import jwt
-from src.config import SECRET_KEY, ALGORITHM
-from src.Auth.service import UserManager
+
 from src.Auth.jwt_settings import AuthJWT
-from src.database import async_session_maker
+from src.Auth.service import UserManager
+from src.config import ALGORITHM, SECRET_KEY
+from src.database import async_session_maker, get_async_session
 
 
 class AdminAuth(AuthenticationBackend):

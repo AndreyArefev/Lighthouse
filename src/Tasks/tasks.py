@@ -1,8 +1,9 @@
-from src.Tasks.app_celery import celery
-from src.config import SMTP_USER, SMTP_HOST, SMTP_PASS, SMTP_PORT
-from src.Tasks.email_templates import create_verified_email
 import smtplib
 from typing import Annotated
+
+from src.config import SMTP_HOST, SMTP_PASS, SMTP_PORT, SMTP_USER
+from src.Tasks.app_celery import celery
+from src.Tasks.email_templates import create_verified_email
 
 
 @celery.task

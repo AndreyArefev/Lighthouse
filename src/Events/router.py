@@ -1,12 +1,13 @@
-from typing import List
-from fastapi import APIRouter, Query, status
 from datetime import date
-from .schemas import Event, Category, Tag, EventCreate
-from fastapi import Depends
+from typing import List
+
+from fastapi import APIRouter, Depends, Query, status
+
 from src.Auth.dependencies import get_current_active_user as current_user
 from src.Auth.models import User
-from .service import EventManager
 
+from .schemas import Category, Event, EventCreate, Tag
+from .service import EventManager
 
 router = APIRouter(
     prefix='/events',

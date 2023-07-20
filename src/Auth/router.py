@@ -1,14 +1,14 @@
-from fastapi import HTTPException, Depends, Response, APIRouter
-from src.Auth.schemas import SCreateUser, SAuthUser
-from src.Auth.jwt_settings import AuthJWT
-import src.exception as ex
-from src.Auth.utils import get_password_hash, create_confirm_token
-from src.Auth.service import UserManager
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from src.Tasks.tasks import send_verified_email
-from src.Auth.dependencies import get_current_user
-from src.Auth.models import User
 
+import src.exception as ex
+from src.Auth.dependencies import get_current_user
+from src.Auth.jwt_settings import AuthJWT
+from src.Auth.models import User
+from src.Auth.schemas import SAuthUser, SCreateUser
+from src.Auth.service import UserManager
+from src.Auth.utils import create_confirm_token, get_password_hash
+from src.Tasks.tasks import send_verified_email
 
 router = APIRouter(
     prefix="/auth",

@@ -1,15 +1,15 @@
 from fastapi import FastAPI
-from src.database import engine
-from sqladmin import Admin
-from src.AdminPanel.views import UserAdmin, EventAdmin
-from src.AdminPanel.auth import authentication_backend
-from src.Events.router import router as event_router
-from src.Auth.router import router as auth_router
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from fastapi_cache.decorator import cache
 from redis import asyncio as aioredis
+from sqladmin import Admin
+
+from src.AdminPanel.auth import authentication_backend
+from src.AdminPanel.views import EventAdmin, UserAdmin
+from src.Auth.router import router as auth_router
 from src.config import REDIS_HOST
+from src.database import engine
+from src.Events.router import router as event_router
 
 app = FastAPI(
     title='LighthouseAPI'

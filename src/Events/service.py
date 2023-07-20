@@ -1,14 +1,17 @@
 from datetime import date
 from typing import Any
-from .models import Event, Category, Tag
-from src.Auth.models import User
-from .schemas import EventCreate
-from src.database import async_session_maker
+
 from fastapi import Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert, select, update
-from sqlalchemy.orm import selectinload
 from fastapi_cache.decorator import cache
+from sqlalchemy import insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from src.Auth.models import User
+from src.database import async_session_maker
+
+from .models import Category, Event, Tag
+from .schemas import EventCreate
 
 
 class EventManager:

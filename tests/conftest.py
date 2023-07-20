@@ -32,8 +32,6 @@ async def prepare_database():
     for user in users:
         user["registered_at"] = datetime.strptime(user["registered_at"], "%Y-%m-%d")
 
-    print(users)
-
     async with async_session_maker() as session:
         add_users = insert(User).values(users)
         add_events = insert(Event).values(events)
@@ -61,12 +59,12 @@ async def ac():
         yield ac
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 async def ac_auth_client():
-    async with AsyncClient(app=fastapi_app, base_url="http://test", cookies={
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHJpbmc5MiIsImlhdCI6MTY4OTY3ODgwNCwibmJmIjoxNjg5Njc4ODA0LCJqdGkiOiJiMGVhYWY2NS0wYjkxLTRmZDctOGQxZS03NDJkYTEyYjM4YTgiLCJleHAiOjE2ODk2Nzk3MDQsInR5cGUiOiJhY2Nlc3MiLCJmcmVzaCI6ZmFsc2V9.n7OndRXKwWfH-h5hX__Cg6rLsf28rWQDWYKshZRJZCA",
-  "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHJpbmc5MiIsImlhdCI6MTY4OTY3ODgwNCwibmJmIjoxNjg5Njc4ODA0LCJqdGkiOiI5ODY1NmVhZi0wOTc5LTQ1Y2YtOGM0Yy1hZDE0ZGJiM2Q1NzYiLCJleHAiOjE2OTIyNzA4MDQsInR5cGUiOiJyZWZyZXNoIn0.dSvlAW0G6kNa74PDdmIZmPMIy0MBtAgIF8msP2xgatc"
-}) as ac_auth:
+    async with AsyncClient(app=fastapi_app, base_url="http://test") as ac_auth:
+        users = open_mock_json('test_login_user')
+        await ac_auth.post('auth/login', json=users[0])
+        assert ac_auth.cookies['access_token']
         yield ac_auth
 
 
@@ -83,10 +81,3 @@ def event_loop(request):
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
-
-
-@pytest.fixture(scope="session")
-async def active_user():
-
-    async with async_session_maker() as session:
-        yield session

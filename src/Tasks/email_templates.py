@@ -1,7 +1,10 @@
 from email.message import EmailMessage
-from src.config import SMTP_USER
+
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
+
+from src.config import SMTP_USER
+
 
 def create_verified_email(email_to, email_from, confirm_token):
     email = EmailMessage()

@@ -1,10 +1,11 @@
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from datetime import datetime
 from typing import AsyncGenerator
-from sqlalchemy import NullPool
 
-from .config import DB_URL, TEST_DB_URL, MODE
+from sqlalchemy import NullPool, TIMESTAMP
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
+
+from .config import DB_URL, MODE, TEST_DB_URL
 
 if MODE == "TEST":
     DATABASE_URL = f"sqlite+aiosqlite:///{TEST_DB_URL}"
@@ -16,7 +17,7 @@ else:
 
 
 class Base(DeclarativeBase):
-    pass
+    type_annotation_map = {datetime: TIMESTAMP(timezone=True)}
 
 
 engine = create_async_engine(DATABASE_URL,

@@ -1,17 +1,18 @@
 import datetime
-from sqlalchemy import select, insert, update
+
 from fastapi import Depends
+from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader
+from jose import JWTError, jwt
+from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.Auth.models import User
 from src.Auth.schemas import SCreateUser
-from src.database import get_async_session, async_session_maker
 from src.Auth.utils import verify_password
-from fastapi.templating import Jinja2Templates
-from jose import JWTError, jwt
-from src.Auth.models import User
+from src.config import ALGORITHM, SECRET_KEY
+from src.database import async_session_maker, get_async_session
 from src.exception import ExCredentials
-from src.config import SECRET_KEY, ALGORITHM
-from jinja2 import Environment, FileSystemLoader
 
 
 class UserManager:

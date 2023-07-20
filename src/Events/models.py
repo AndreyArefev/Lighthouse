@@ -1,5 +1,7 @@
-from sqlalchemy import MetaData, Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Text, Boolean
+from sqlalchemy import (TIMESTAMP, Column, ForeignKey, Integer,
+                        String, Table, Text)
 from sqlalchemy.orm import relationship
+
 from src.database import Base
 
 

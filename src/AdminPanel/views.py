@@ -1,6 +1,7 @@
 from sqladmin import ModelView
+
 from src.Auth.models import User
-from src.Events.models import Event, Category, Tag
+from src.Events.models import Category, Event, Tag
 
 
 class UserAdmin(ModelView, model=User):

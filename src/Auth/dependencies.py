@@ -1,11 +1,12 @@
 from typing import Annotated
+
 from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from src.Auth.service import UserManager
+
 from src.Auth.models import User
-from src.exception import ExCredentials, ExInactiveUser, ExNotAdmin, ExTokenExpired
-from src.config import SECRET_KEY, ALGORITHM
+from src.Auth.service import UserManager
+from src.exception import (ExCredentials, ExInactiveUser, ExNotAdmin,
+                           ExTokenExpired)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
