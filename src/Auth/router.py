@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
-from fastapi.security import OAuth2PasswordRequestForm
-
+from fastapi import APIRouter, Depends, HTTPException, Response, Request
+from src.database import redis as r
 import src.exception as ex
-from src.Auth.dependencies import get_current_user
 from src.Auth.jwt_settings import AuthJWT
-from src.Auth.models import User
 from src.Auth.schemas import SAuthUser, SCreateUser
-from src.Auth.service import UserManager
+from src.Auth.service import UserManager, TokenManager
 from src.Auth.utils import create_confirm_token, get_password_hash
-from src.Tasks.tasks import send_verified_email
+
 
 router = APIRouter(
     prefix="/auth",
@@ -29,20 +26,14 @@ async def register_user(user_date: SCreateUser):
 
 
 @router.post('/login')
-async def login(#form_data: OAuth2PasswordRequestForm = Depends(),
-                form_data: SAuthUser,
+async def login(form_data: SAuthUser,
                 authorize: AuthJWT = Depends()):
     user = await UserManager.auth_user(username=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(status_code=401, detail='Логин или пароль неверны')
     if not user.is_verified:
         raise HTTPException(status_code=401, detail='Верифицируйте свой email, перейдя по сслыке в полученном письме')
-    access_token = authorize.create_access_token(subject=form_data.username)
-    refresh_token = authorize.create_refresh_token(subject=form_data.username)
-    authorize.set_access_cookies(access_token)
-    authorize.set_refresh_cookies(refresh_token)
-    #response.set_cookie("access_token", access_token, httponly=True)
-    #response.set_cookie("csrf_refresh_token", refresh_token, httponly=True)
+    access_token, refresh_token = await TokenManager.create_tokens(authorize, user.username)
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 
@@ -53,15 +44,19 @@ async def verification(token: str):
 
 
 @router.post('/refresh')
-async def refresh(authorize: AuthJWT = Depends()):
-    authorize.jwt_refresh_token_required()
-    current_user = authorize.get_jwt_subject()
-    new_access_token = authorize.create_access_token(subject=current_user)
-    authorize.set_access_cookies(new_access_token)
-    return {"access_token": new_access_token}
+async def refresh(request: Request,
+                  authorize: AuthJWT = Depends()):
+    current_user = await TokenManager.get_username_current_user_from_refresh_token(authorize)
+    get_value = await r.get(current_user)
+    refresh_token = get_value.decode("utf-8")
+    if refresh_token == request.cookies.get("refresh_token"):
+        new_access_token, new_refresh_token = await TokenManager.create_tokens(authorize, current_user)
+        return {"access_token": new_access_token, "refresh_token": new_refresh_token}
 
 
 @router.get('/logout')
 async def logout(authorize: AuthJWT = Depends()):
+    current_user = await TokenManager.get_username_current_user_from_refresh_token(authorize)
     authorize.unset_jwt_cookies()
+    await r.delete(current_user)
     return {'status': 'success'}

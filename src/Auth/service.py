@@ -11,8 +11,9 @@ from src.Auth.models import User
 from src.Auth.schemas import SCreateUser
 from src.Auth.utils import verify_password
 from src.config import ALGORITHM, SECRET_KEY
-from src.database import async_session_maker, get_async_session
+from src.database import async_session_maker, get_async_session, redis as r
 from src.exception import ExCredentials
+
 
 
 class UserManager:
@@ -80,3 +81,30 @@ class UserManager:
             return username
         except JWTError:
             raise ExCredentials
+
+
+
+class TokenManager:
+    @classmethod
+    async def create_tokens(cls, authorize, subject):
+        access_token = authorize.create_access_token(subject=subject)
+        refresh_token = authorize.create_refresh_token(subject=subject)
+        await cls._set_refresh_token_in_redis(subject, refresh_token)
+        await cls._set_tokens_in_cookies(authorize, access_token, refresh_token)
+        return access_token, refresh_token
+
+    @staticmethod
+    async def _set_tokens_in_cookies(authorize, access_token, refresh_token):
+        authorize.set_access_cookies(access_token)
+        authorize.set_refresh_cookies(refresh_token)
+
+    @staticmethod
+    async def _set_refresh_token_in_redis(subject, refresh_token):
+        async with r.pipeline(transaction=True) as pipe:
+            await (pipe.set(subject, refresh_token).execute())
+
+    @classmethod
+    async def get_username_current_user_from_refresh_token(cls, authorize):
+        authorize.jwt_refresh_token_required()
+        current_user = authorize.get_jwt_subject()
+        return current_user

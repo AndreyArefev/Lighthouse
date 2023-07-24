@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MODE = env.get("MODE") #DEV
+LOG_LEVEL = env.get("LOG_LEVEL")
 
 DB_HOST = env.get("DB_HOST")
 DB_PORT = env.get("DB_PORT")
@@ -30,7 +31,7 @@ SMTP_USER = env.get("SMTP_USER")
 SMTP_PASS = env.get("SMTP_PASS")
 
 SECRET_KEY_CONFIRM_TOKEN = env.get("SECRET_KEY_CONFIRM_TOKEN")
-AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=15)
 AUTHJWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 SECRET_KEY='secret'
 ALGORITHM='HS256'
