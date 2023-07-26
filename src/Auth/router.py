@@ -48,17 +48,32 @@ async def verification(token: str):
 @router.post('/refresh')
 async def refresh(request: Request,
                   authorize: AuthJWT = Depends()):
-    current_user = await TokenManager.get_username_current_user_from_refresh_token(authorize)
-    get_value = await r.get(current_user)
-    refresh_token = get_value.decode("utf-8")
-    if refresh_token == request.cookies.get("refresh_token"):
+    refresh_token = request.cookies.get("refresh_token")
+    if await r.get(refresh_token):
+        current_user = await TokenManager.get_username_current_user_from_refresh_token(authorize)
         new_access_token, new_refresh_token = await TokenManager.create_tokens(authorize, current_user)
+        await r.delete(refresh_token)
         return {"access_token": new_access_token, "refresh_token": new_refresh_token}
 
 
 @router.get('/logout')
-async def logout(authorize: AuthJWT = Depends()):
-    current_user = await TokenManager.get_username_current_user_from_refresh_token(authorize)
-    await authorize.unset_jwt_cookies()
-    await r.delete(current_user)
-    return {'status': 'success'}
+async def logout(request: Request,
+                 authorize: AuthJWT = Depends()):
+    refresh_token = request.cookies.get("refresh_token")
+    if refresh_token:
+        await r.delete(refresh_token)
+        await authorize.unset_jwt_cookies()
+        return {'status': 'success'}
+    else:
+        return {'status': 'error'}
+
+
+
+
+
+
+
+
+
+
+

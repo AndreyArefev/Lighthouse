@@ -104,18 +104,16 @@ class TokenManager:
 
     @staticmethod
     async def _set_tokens_in_cookies(authorize, access_token, refresh_token):
-        authorize.set_access_cookies(access_token)
-        authorize.set_refresh_cookies(refresh_token)
+        await authorize.set_access_cookies(access_token)
+        await authorize.set_refresh_cookies(refresh_token)
 
     @staticmethod
     async def _set_refresh_token_in_redis(subject, refresh_token):
-        print(subject)
-        print(refresh_token)
         async with r.pipeline(transaction=True) as pipe:
-            await (pipe.set(subject, refresh_token).execute())
+            await (pipe.set(refresh_token, subject).execute())
 
     @classmethod
     async def get_username_current_user_from_refresh_token(cls, authorize):
-        authorize.jwt_refresh_token_required()
-        current_user = authorize.get_jwt_subject()
+        await authorize.jwt_refresh_token_required()
+        current_user = await authorize.get_jwt_subject()
         return current_user
