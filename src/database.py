@@ -6,14 +6,15 @@ from sqlalchemy import NullPool, TIMESTAMP
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-from .config import DB_URL, MODE, TEST_DB_URL, REDIS_HOST, REDIS_PORT
+import src.config as c
 
-if MODE == "TEST":
-    DATABASE_URL = f"sqlite+aiosqlite:///{TEST_DB_URL}"
+if c.MODE == "TEST":
+    DATABASE_URL = f"postgresql+asyncpg://{c.TEST_DB_USER}:{c.TEST_DB_PASS}@{c.TEST_DB_HOST}:{c.TEST_DB_PORT}/{c.TEST_DB_NAME}"
+    SQLITE_DATABASE_URL = f"ssqlite+aiosqlite:///{c.TEST_SQLITE_DB_URL}"
     DATABASE_PARAMS = {"poolclass": NullPool}
-    print(MODE)
 else:
-    DATABASE_URL = f"sqlite+aiosqlite:///{DB_URL}"
+    DATABASE_URL = f"postgresql+asyncpg://{c.DB_USER}:{c.DB_PASS}@{c.DB_HOST}:{c.DB_PORT}/{c.DB_NAME}"
+    SQLITE_DATABASE_URL = f"sqlite+aiosqlite:///{c.SQLITE_DB_URL}"
     DATABASE_PARAMS = {}
 
 
@@ -29,13 +30,10 @@ async_session_maker = sessionmaker(engine,
                                    class_=AsyncSession,
                                    expire_on_commit=False)
 
-redis = aioredis.from_url(f"redis://{REDIS_HOST}")
+redis = aioredis.from_url(f"redis://{c.REDIS_HOST}")
+
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
 
-
-async def get_redis_connect():
-    connection = aioredis.Redis(host=REDIS_HOST, port=REDIS_PORT)
-    yield connection

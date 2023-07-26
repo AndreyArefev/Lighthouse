@@ -5,6 +5,7 @@ from src.Auth.jwt_settings import AuthJWT
 from src.Auth.schemas import SAuthUser, SCreateUser
 from src.Auth.service import UserManager, TokenManager
 from src.Auth.utils import create_confirm_token, get_password_hash
+from src.Tasks.tasks import send_verified_email
 
 
 router = APIRouter(
@@ -22,7 +23,8 @@ async def register_user(user_date: SCreateUser):
     user_date.password = get_password_hash(user_date.password)
     confirm_token = create_confirm_token(user_date.username)
     send_verified_email.delay(user_date.email, confirm_token)
-    await UserManager.create_user(user_date)
+    new_user = await UserManager.create_user(user_date)
+    return new_user
 
 
 @router.post('/login')
@@ -57,6 +59,6 @@ async def refresh(request: Request,
 @router.get('/logout')
 async def logout(authorize: AuthJWT = Depends()):
     current_user = await TokenManager.get_username_current_user_from_refresh_token(authorize)
-    authorize.unset_jwt_cookies()
+    await authorize.unset_jwt_cookies()
     await r.delete(current_user)
     return {'status': 'success'}

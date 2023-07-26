@@ -1,0 +1,73 @@
+version: '3.7'
+volumes:
+  new_database:
+
+services:
+  db:
+    image: postgres:15
+    container_name: lighthouse_db
+    restart: always
+    volumes:
+      - new_database:/lighthouse/resources:rw
+    env_file:
+      - .env-prod
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lighthouse_db
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:7
+    container_name: lighthouse_redis
+    restart: always
+    volumes:
+      - new_database:/lighthouse/resources:rw
+    env_file:
+      - .env-prod
+    ports:
+      - 6379:6379
+
+  lighthouse_app:
+    image: no
+    build:
+      context: .
+    container_name: lighthouse_app
+    env_file:
+      - .env-prod
+    depends_on:
+      - db
+      - redis
+    command: ["./scripts/docker_app.sh"]
+    ports:
+      - 9000:8000
+
+  celery:
+    image: no
+    build:
+      context: .
+    container_name: lighthouse_celery
+    env_file:
+      - .env-prod
+    restart: always
+    depends_on:
+      - redis
+    command: ["./scripts/docker_celery.sh", "celery"]
+
+  flower:
+    image: no
+    build:
+      context: .
+    container_name: lighthouse_flower
+    env_file:
+      - .env-prod
+    restart: always
+    depends_on:
+      - redis
+    ports:
+      - 5555:5555
+    command: ["./scripts/docker_celery.sh", "flower"]
+
+
+

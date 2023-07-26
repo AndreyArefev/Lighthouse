@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi_jwt_auth import AuthJWT
+from async_fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
 import src.config as conf

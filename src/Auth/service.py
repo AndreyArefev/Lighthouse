@@ -1,11 +1,9 @@
 import datetime
 
-from fastapi import Depends
-from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
 from jose import JWTError, jwt
 from sqlalchemy import insert, select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import SQLAlchemyError
 
 from src.Auth.models import User
 from src.Auth.schemas import SCreateUser
@@ -13,6 +11,7 @@ from src.Auth.utils import verify_password
 from src.config import ALGORITHM, SECRET_KEY
 from src.database import async_session_maker, get_async_session, redis as r
 from src.exception import ExCredentials
+from src.logger import logger
 
 
 
@@ -29,20 +28,31 @@ class UserManager:
 
     @classmethod
     async def create_user(cls, user: SCreateUser) -> User:
+        #try:
         async with async_session_maker() as session:
             new_user = User(email=user.email,
-                            username=user.username,
-                            phone=user.phone,
-                            image=user.image,
-                            registered_at=datetime.date.today(),
-                            hashed_password=user.password,
-                            is_active=True,
-                            is_superuser=False,
-                            is_verified=False
-                            )
+                                username=user.username,
+                                phone=user.phone,
+                                image=user.image,
+                                registered_at=datetime.date.today(),
+                                hashed_password=user.password,
+                                is_active=True,
+                                is_superuser=False,
+                                is_verified=False
+                                )
             session.add(new_user)
             await session.commit()
             return new_user
+        '''except (SQLAlchemyError, Exception) as error:
+            if error == SQLAlchemyError:
+                msg = 'Database exs:'
+            else:
+                msg = 'Unknown exs:'
+            msg += ' Cannot add user'
+            extra = {'user': user.username}
+            logger.error(msg, extra=extra, exc_info=True)'''
+
+
 
     @classmethod
     async def auth_user(cls, username: str, password: str) -> User | None:
@@ -83,12 +93,11 @@ class UserManager:
             raise ExCredentials
 
 
-
 class TokenManager:
     @classmethod
     async def create_tokens(cls, authorize, subject):
-        access_token = authorize.create_access_token(subject=subject)
-        refresh_token = authorize.create_refresh_token(subject=subject)
+        access_token = await authorize.create_access_token(subject=subject)
+        refresh_token = await authorize.create_refresh_token(subject=subject)
         await cls._set_refresh_token_in_redis(subject, refresh_token)
         await cls._set_tokens_in_cookies(authorize, access_token, refresh_token)
         return access_token, refresh_token
@@ -100,6 +109,8 @@ class TokenManager:
 
     @staticmethod
     async def _set_refresh_token_in_redis(subject, refresh_token):
+        print(subject)
+        print(refresh_token)
         async with r.pipeline(transaction=True) as pipe:
             await (pipe.set(subject, refresh_token).execute())
 

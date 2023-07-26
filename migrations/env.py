@@ -4,10 +4,10 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from src.config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS, DB_URL
+from src.config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS, SQLITE_DB_URL
 from src.Events.models import Base as EventBase
 from src.Auth.models import Base as AuthBase
-from src.database import Base
+from src.database import Base, DATABASE_URL
 import sqlalchemy_utils
 
 
@@ -15,13 +15,15 @@ import sqlalchemy_utils
 # access to the values within the .ini file in use.
 config = context.config
 
-section = config.config_ini_section
-config.set_section_option(section, "DB_HOST", DB_HOST)
-config.set_section_option(section, "DB_PORT", DB_PORT)
-config.set_section_option(section, "DB_NAME", DB_NAME)
-config.set_section_option(section, "DB_USER", DB_USER)
-config.set_section_option(section, "DB_PASS", DB_PASS)
-config.set_section_option(section, "DB_URL", DB_URL)
+
+config.set_main_option("sqlalchemy.url", f"{DATABASE_URL}?async_fallback=True")
+#section = config.config_ini_section
+#config.set_section_option(section, "DB_HOST", DB_HOST)
+#config.set_section_option(section, "DB_PORT", DB_PORT)
+#config.set_section_option(section, "DB_NAME", DB_NAME)
+#config.set_section_option(section, "DB_USER", DB_USER)
+#config.set_section_option(section, "DB_PASS", DB_PASS)
+#config.set_section_option(section, "DB_URL", SQLITE_DB_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

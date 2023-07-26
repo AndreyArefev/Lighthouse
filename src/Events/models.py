@@ -6,10 +6,10 @@ from src.database import Base
 
 
 class Event(Base):
-    __tablename__ = 'event'
+    __tablename__ = 'events'
     id_event: Mapped[int] = mapped_column(primary_key=True)
     name_event: Mapped[str] = mapped_column(String(200), nullable=False)
-    id_category: Mapped[int] = mapped_column(ForeignKey('category.id_category'))
+    id_category: Mapped[int] = mapped_column(ForeignKey('categories.id_category'))
     category = relationship('Category', back_populates='events')
     tags = relationship('Tag', secondary='tableEventTag', back_populates='events')
     time_event: Mapped[datetime]
@@ -19,7 +19,7 @@ class Event(Base):
     age_limit: Mapped[int]
     image: Mapped[str]
     link: Mapped[str]
-    id_organizer: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    id_organizer: Mapped[int] = mapped_column(ForeignKey('users.id'))
     organizer = relationship('User', back_populates='events')
 
     def __str__(self):
@@ -27,7 +27,7 @@ class Event(Base):
 
 
 class Category(Base):
-    __tablename__ = 'category'
+    __tablename__ = 'categories'
     id_category: Mapped[int] = mapped_column(primary_key=True)
     name_category: Mapped[str] = mapped_column(nullable=False, unique=True)
     events = relationship('Event', back_populates='category')
@@ -37,7 +37,7 @@ class Category(Base):
 
 
 class Tag(Base):
-    __tablename__ = 'tag'
+    __tablename__ = 'tags'
     id_tag: Mapped[int] = mapped_column(primary_key=True)
     name_tag: Mapped[str] = mapped_column(String(150), nullable=False, unique=True)
     events = relationship('Event', secondary='tableEventTag', back_populates='tags')
@@ -48,6 +48,6 @@ class Tag(Base):
 
 tableEventTag = Table('tableEventTag',
                       Base.metadata,
-                      Column('event', ForeignKey('event.id_event'), primary_key=True),
-                      Column('tag', ForeignKey('tag.id_tag'), primary_key=True),
+                      Column('event', ForeignKey('events.id_event'), primary_key=True),
+                      Column('tag', ForeignKey('tags.id_tag'), primary_key=True),
                       )
