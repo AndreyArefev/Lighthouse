@@ -11,4 +11,7 @@ tasks
 __pycache__/
 test_sqlite_database.db
 tests/__pycache__/conftest.cpython-311-pytest-7.4.0.pyc
+scripts/test.sh
+src/pass_main.py
+test.json
 
