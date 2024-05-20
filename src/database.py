@@ -17,12 +17,15 @@ else:
     SQLITE_DATABASE_URL = f"sqlite+aiosqlite:///{c.SQLITE_DB_URL}"
     DATABASE_PARAMS = {}
 
+if c.DB_SQLITE:
+    CURRENT_DATABASE_URL = SQLITE_DATABASE_URL
+else:
+    CURRENT_DATABASE_URL = DATABASE_URL
 
 class Base(DeclarativeBase):
     type_annotation_map = {datetime: TIMESTAMP(timezone=True)}
 
-
-engine = create_async_engine(DATABASE_URL,
+engine = create_async_engine(CURRENT_DATABASE_URL,
                              echo=True,
                              **DATABASE_PARAMS)
 

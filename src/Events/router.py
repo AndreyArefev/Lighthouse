@@ -8,6 +8,12 @@ from src.Auth.models import User
 
 from .schemas import Category, Event, EventCreate, Tag
 from .service import EventManager
+import src.config as c
+
+UPLOAD_FOLDER = "static/images"  # Папка для хранения изображений
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 router = APIRouter(
     prefix='/events',
@@ -106,3 +112,21 @@ def get_events_on_date(current_date: date):
             response_model=List[Event])
 def get_events_selected_user(id_user: int):
     return EventManager.get_events_selected_user(id_user)
+
+
+@router.post("/upload/")
+async def upload_image(file: UploadFile = File(...), request: Request):
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    with open(file_path, "wb") as image_file:
+        content = await file.read()
+        image_file.write(content)
+    base_url = request.base_url
+    image_url = f"{base_url}images/{file.filename}"
+    return image_url
+
+
+@app.get("/images/{image_path}") 
+async def get_image(image_path: str):
+    if not image_рath:
+        raise HTTPException(status_code=400, detail="Image URL is required")
+    return FileResponse(image_path)

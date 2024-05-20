@@ -35,3 +35,6 @@ AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
 AUTHJWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 SECRET_KEY='secret'
 ALGORITHM='HS256'
+
+DB_SQLITE = env.get("DB_SQLITE")
+IP = env.get("IP")

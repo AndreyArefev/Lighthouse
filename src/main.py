@@ -23,7 +23,6 @@ sentry_sdk.init(
     dsn="https://d80e3d565ed84f12b944f8c79ad0af64@o4505583956393984.ingest.sentry.io/4505583978676224"
 )
 
-
 app.include_router(auth_router)
 app.include_router(event_router)
 
