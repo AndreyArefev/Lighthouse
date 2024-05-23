@@ -1,5 +1,6 @@
 import time
 import sentry_sdk
+import os
 
 from fastapi import FastAPI, Request
 from fastapi_cache import FastAPICache

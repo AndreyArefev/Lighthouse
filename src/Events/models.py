@@ -1,9 +1,17 @@
 from sqlalchemy import Column, ForeignKey, String, Table
-from sqlalchemy.orm import relationship, mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, registry, relationship, Mapped
 from datetime import datetime
 
 from src.database import Base
 
+class Category(Base):
+    __tablename__ = 'categories'
+    id_category: Mapped[int] = mapped_column(primary_key=True)
+    name_category: Mapped[str] = mapped_column(nullable=False, unique=True)
+    events = relationship('Event', back_populates='category')
+
+    def __str__(self):
+        return self.name_category
 
 class Event(Base):
     __tablename__ = 'events'
@@ -24,16 +32,6 @@ class Event(Base):
 
     def __str__(self):
         return self.name_event
-
-
-class Category(Base):
-    __tablename__ = 'categories'
-    id_category: Mapped[int] = mapped_column(primary_key=True)
-    name_category: Mapped[str] = mapped_column(nullable=False, unique=True)
-    events = relationship('Event', back_populates='category')
-
-    def __str__(self):
-        return self.name_category
 
 
 class Tag(Base):

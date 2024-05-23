@@ -1,6 +1,6 @@
 version: '3.10'
 volumes:
-  new_database:
+  database_data:
   app_data:
 
 services:
@@ -9,7 +9,7 @@ services:
     container_name: lighthouse_db
     restart: always
     volumes:
-      - new_database:/lighthouse/resources:rw
+      - database_data:/lighthouse/resources:rw
     env_file:
       - .env
     environment:

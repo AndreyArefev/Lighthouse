@@ -2,6 +2,8 @@ from datetime import date
 from typing import List
 
 from fastapi import APIRouter, Depends, Query, status
+from fastapi import FastAPI, File, UploadFile, Request, HTTPException
+from fastapi.responses import FileResponse
 
 from src.Auth.dependencies import get_current_active_user as current_user
 from src.Auth.models import User
@@ -9,6 +11,7 @@ from src.Auth.models import User
 from .schemas import Category, Event, EventCreate, Tag
 from .service import EventManager
 import src.config as c
+import os
 
 UPLOAD_FOLDER = "static/images"  # Папка для хранения изображений
 
@@ -20,8 +23,11 @@ router = APIRouter(
     tags=['События']
 )
 
+@router.get('/test_without_auth')
+async def get_test():
+    return True
 
-@router.get('/test')
+@router.get('/test_with_auth')
 async def get_test(user: User = Depends(current_user)):
     return user
 
@@ -115,7 +121,7 @@ def get_events_selected_user(id_user: int):
 
 
 @router.post("/upload/")
-async def upload_image(file: UploadFile = File(...), request: Request):
+async def upload_image(request: Request, file: UploadFile = File(...)):
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
     with open(file_path, "wb") as image_file:
         content = await file.read()
@@ -125,8 +131,9 @@ async def upload_image(file: UploadFile = File(...), request: Request):
     return image_url
 
 
-@app.get("/images/{image_path}") 
-async def get_image(image_path: str):
-    if not image_рath:
+@router.get("/get_image/{image_name}") 
+async def get_image(image_name: str):
+    if not image_path:
         raise HTTPException(status_code=400, detail="Image URL is required")
+    image_path = os.path.join(UPLOAD_FOLDER, image_name)
     return FileResponse(image_path)

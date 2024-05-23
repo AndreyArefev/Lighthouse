@@ -55,15 +55,15 @@ def upgrade() -> None:
     sa.Column('image', sa.String(), nullable=True),
     sa.Column('link', sa.String(), nullable=True),
     sa.Column('id_organizer', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['id_category'], ['category.id_category'], ),
-    sa.ForeignKeyConstraint(['id_organizer'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['id_category'], ['categories.id_category'], ),
+    sa.ForeignKeyConstraint(['id_organizer'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id_event')
     )
     op.create_table('tableEventTag',
     sa.Column('event', sa.Integer(), nullable=False),
     sa.Column('tag', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['event'], ['event.id_event'], ),
-    sa.ForeignKeyConstraint(['tag'], ['tag.id_tag'], ),
+    sa.ForeignKeyConstraint(['event'], ['events.id_event'], ),
+    sa.ForeignKeyConstraint(['tag'], ['tags.id_tag'], ),
     sa.PrimaryKeyConstraint('event', 'tag')
     )
     # ### end Alembic commands ###
