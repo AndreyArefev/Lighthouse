@@ -31,10 +31,10 @@ SMTP_USER = env.get("SMTP_USER")
 SMTP_PASS = env.get("SMTP_PASS")
 
 SECRET_KEY_CONFIRM_TOKEN = env.get("SECRET_KEY_CONFIRM_TOKEN")
-AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+AUTHJWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
 AUTHJWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 SECRET_KEY='secret'
 ALGORITHM='HS256'
 
-DB_SQLITE = env.get("DB_SQLITE")
+DB = env.get("DB")
 IP = env.get("IP")

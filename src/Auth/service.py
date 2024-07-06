@@ -33,12 +33,11 @@ class UserManager:
             new_user = User(email=user.email,
                                 username=user.username,
                                 phone=user.phone,
-                                image=user.image,
                                 registered_at=datetime.date.today(),
                                 hashed_password=user.password,
                                 is_active=True,
                                 is_superuser=False,
-                                is_verified=False
+                                is_verified=True, #когда внедрим верификацию поставить false
                                 )
             session.add(new_user)
             await session.commit()
@@ -96,11 +95,22 @@ class UserManager:
 class TokenManager:
     @classmethod
     async def create_tokens(cls, authorize, subject):
-        access_token = await authorize.create_access_token(subject=subject)
-        refresh_token = await authorize.create_refresh_token(subject=subject)
-        await cls._set_refresh_token_in_redis(subject, refresh_token)
+        access_token = await cls.create_access_token(authorize, subject)
+        refresh_token = await cls.create_refresh_token(authorize, subject)
         await cls._set_tokens_in_cookies(authorize, access_token, refresh_token)
         return access_token, refresh_token
+    
+    @classmethod
+    async def create_access_token(cls, authorize, subject):
+        access_token = await authorize.create_access_token(subject=subject)
+        return access_token
+
+
+    @classmethod
+    async def create_refresh_token(cls, authorize, subject):
+        refresh_token = await authorize.create_refresh_token(subject=subject)
+        await cls._set_refresh_token_in_redis(subject, refresh_token)
+        return refresh_token
 
     @staticmethod
     async def _set_tokens_in_cookies(authorize, access_token, refresh_token):

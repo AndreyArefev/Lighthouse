@@ -37,9 +37,10 @@ admin.add_view(CategoryAdmin)
 admin.add_view(TagAdmin)
 
 
-@app.on_event("startup")
+'''@app.on_event("startup")
 async def startup():
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")'''
+    
 
 
 @app.middleware("http")

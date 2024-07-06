@@ -1,24 +1,9 @@
 version: '3.10'
 volumes:
   database_data:
-  app_data:
+  sqlite_database.db:
 
 services:
-  db:
-    image: postgres:15
-    container_name: lighthouse_db
-    restart: always
-    volumes:
-      - database_data:/lighthouse/resources:rw
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: lighthouse_db
-    ports:
-      - 5432:5432
-
   redis:
     image: redis:7
     container_name: lighthouse_redis
@@ -34,11 +19,10 @@ services:
       context: .
     container_name: lighthouse_app
     volumes:
-      - app_data:/lighthouse/resources:rw
+      - ./sqlite_database.db:/lighthouse/sqlite_database.db:rw
     env_file:
       - .env
     depends_on:
-      - db
       - redis
     command: ["./scripts/docker_app.sh"]
     ports:
@@ -72,5 +56,7 @@ services:
       - 5555:5555
     command: ["./scripts/docker_celery.sh", "flower"]
 
+networks:
+  default:
 
 

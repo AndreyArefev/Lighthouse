@@ -14,7 +14,7 @@ class SBaseInfoUser(BaseModel):
     email: EmailStr
     phone: constr(strip_whitespace=True,
                   regex=r"^(\+)[1-9][0-9\-\(\)\.]{9,15}$")
-    image: AnyHttpUrl
+
 
     class Config:
         orm_mode = True
@@ -39,6 +39,5 @@ class SUpdateUser(BaseModel):
     password: Optional[str]
     phone: Optional[constr(strip_whitespace=True,
                            regex=r"^(\+)[1-9][0-9\-\(\)\.]{9,15}$")]
-    image: Optional[AnyHttpUrl]
 
 

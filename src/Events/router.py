@@ -5,10 +5,11 @@ from fastapi import APIRouter, Depends, Query, status
 from fastapi import FastAPI, File, UploadFile, Request, HTTPException
 from fastapi.responses import FileResponse
 
-from src.Auth.dependencies import get_current_active_user as current_user
+from src.Auth.dependencies import get_current_active_user as current_user, get_current_superuser
 from src.Auth.models import User
+from src.Events.utils import get_unique_filename
 
-from .schemas import Category, Event, EventCreate, Tag
+from .schemas import Category, Event, EventCreate, Tag, CategoryCreate, WrapperCategoryCreate, CategoryWithEvent
 from .service import EventManager
 import src.config as c
 import os
@@ -34,15 +35,21 @@ async def get_test(user: User = Depends(current_user)):
 
 @router.get('/',
             response_model=List[Event])
-async def get_events(user: User = Depends(current_user)):
+async def get_events():
     all_events = await EventManager.get_events()
     return all_events
+
+@router.get('/categories', 
+            response_model=WrapperCategoryCreate)
+async def get_categories_with_events():
+    all_categories_with_events = await EventManager.get_categories_with_events()
+    return {'all_events': all_categories_with_events}
 
 
 @router.get('/{user_id}/',
             response_model=List[Event])
-async def get_events(user_id: int,
-                     user: User = Depends(current_user)):
+async def get_events_current_user(user_id: int,
+                                  user: User = Depends(current_user)):
     all_user_events = await EventManager.get_user_events(user_id)
     return all_user_events
 
@@ -74,9 +81,10 @@ async def put_event(event: EventCreate,
 
 
 @router.delete('/{id_event}',
-               status_code=status.HTTP_204_NO_CONTENT)
-def del_event(id_event: int):
-    return EventManager.del_event(id_event)
+               status_code=status.HTTP_204_NO_CONTENT) #права админа
+async def del_event(id_event: int):
+    await EventManager.del_event(id_event)
+
 
 
 @router.get('/search',
@@ -85,9 +93,17 @@ def get_events_search_by_name(name_event: str = Query()):
     return EventManager.get_events_search_by_name(name_event)
 
 
-@router.get('/categories', response_model=List[Category])
+@router.get('/categories_list', response_model=List[Category])
 def get_categories():
     return EventManager.get_categories()
+
+@router.post('/add_category', 
+             response_model=Category,
+             status_code=status.HTTP_201_CREATED)
+async def add_category(category: CategoryCreate,
+                       user: User = Depends(current_user)): #установить только админский доступ
+    new_category = await EventManager.add_category(category.name_category)
+    return new_category
 
 
 @router.get('/categories/{id_category}',
@@ -119,21 +135,26 @@ def get_events_on_date(current_date: date):
 def get_events_selected_user(id_user: int):
     return EventManager.get_events_selected_user(id_user)
 
-
+UPLOAD_FOLDER = "static/images"  # Папка для хранения изображений
 @router.post("/upload/")
 async def upload_image(request: Request, file: UploadFile = File(...)):
+    '''Загрузка файлов на сервер'''
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    with open(file_path, "wb") as image_file:
-        content = await file.read()
-        image_file.write(content)
+    while os.path.exists(file_path):
+        file.filename = get_unique_filename(file.filename)
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    try:
+        with open(file_path, "wb") as image_file:
+            content = await file.read()
+            image_file.write(content)
+    except IOError as e:
+        raise HTTPException(status_code=500, detail="Error saving the file")
     base_url = request.base_url
-    image_url = f"{base_url}images/{file.filename}"
+    image_url = f"{base_url}events/get_image/{file.filename}"
     return image_url
 
 
 @router.get("/get_image/{image_name}") 
 async def get_image(image_name: str):
-    if not image_path:
-        raise HTTPException(status_code=400, detail="Image URL is required")
     image_path = os.path.join(UPLOAD_FOLDER, image_name)
     return FileResponse(image_path)
